@@ -1367,6 +1367,19 @@ assert "`r(formnotdata_vars)'" == "DoesntExist"
 compall Expected
 cd ..
 
+/* -------------------------------------------------------------------------- */
+					/* -shortnames-				*/
+
+* Test 210
+cd 210
+odkmeta using import, ///
+	csv(odkmetatest210) survey(survey) choices(choices) replace ///
+	shortnames
+get_warnings import
+compall Expected
+cd ..
+
+
 
 /* -------------------------------------------------------------------------- */
 					/* live-project testing		*/
