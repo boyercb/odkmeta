@@ -43,6 +43,7 @@ the column headers {it:headers}{p_end}
 the column headers {it:headers}{p_end}
 {synopt:{opt rel:ax}}ignore fields in {it:surveyfile} that
 do not exist in {it:csvfile}{p_end}
+{synopt:{opt shortnames}}use shortened field names; useful when fields exceed Stata's 32 character limit for variable names{p_end}
 
 {syntab:Lists}
 {* Using -help ca- as a template.}{...}
@@ -219,21 +220,9 @@ such renaming should go in the designated areas.
 However, some forms,
 usually because of many nested groups or groups with long names,
 have many long field names that become duplicate Stata names (problem 2 above).
-In this case, it may work best to use fields' short names where possible.
-The following code attempts to rename variables to their field short names.
-Place it as-is before the renaming for {cmd:split}:
+In this case, it may work best to use fields' short names which are available via
+the {cmd:shortnames} option.
 
-{cmd}{...}
-{phang}foreach var of varlist _all {{p_end}
-{phang2}if "`:char `var'[Odk_group]'" != "" {{p_end}
-{phang3}local name = "`:char `var'[Odk_name]'" + ///{p_end}
-{p 16 20 2}cond(`:char `var'[Odk_is_other]', "_other", "") + ///{p_end}
-{p 16 20 2}"`:char `var'[Odk_geopoint]'"{p_end}
-{phang3}local newvar = strtoname("`name'"){p_end}
-{phang3}capture rename `var' `newvar'{p_end}
-{phang2}}{p_end}
-{phang}}{p_end}
-{txt}{...}
 
 
 {marker remarks_lists}{...}
@@ -545,6 +534,13 @@ For fields associated with multiple variables, for example,
 {cmd:geopoint} fields, {opt relax} attempts to attach
 the characteristics to as many variables as possible:
 an error does not result if some but not all variables exist.
+
+{phang}
+{opt shortnames} specifies that a field's shortname is to be used. By default,
+ODK outputs field names in "long name" form, which are formed by concatenating
+the list of {it:groups} in which the field is nested with the field's "short name".
+This option will import fields using their short names (i.e. with out group names)
+which can be useful when long names exceed Stata's limits.
 
 {dlgtab:Lists}
 
