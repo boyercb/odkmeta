@@ -1,4 +1,5 @@
-*! version 1.2.0 Matthew White 02sep2014
+// odkmeta.do
+
 pr odkmeta
 	vers 11.2
 
@@ -7,13 +8,15 @@ pr odkmeta
 		* [ID 185]
 		di as err "SSC package specialexp required"
 		di as err "to install, type {cmd:ssc install specialexp}"
+		di as err "{p}after installation, you may need to " ///
+			"{help mata mlib:index Mata} or restart Stata{p_end}"
 		ex 198
 	}
 
 	#d ;
 	syntax using/, csv(str)
 		/* survey options */
-		Survey(str asis) [DROPattrib(str asis) KEEPattrib(str asis) RELax]
+		Survey(str asis) [DROPattrib(str asis) KEEPattrib(str asis) RELax longnames]
 		/* choices options */
 		CHOices(str asis) [OTHer(str) ONEline]
 		/* other options */
@@ -29,6 +32,7 @@ pr odkmeta
 	-DROPattrib()- from -drop-.
 	-KEEPattrib()- from -keep- and -cluster subcommand, KEEPcenters-.
 	-RELax- from -sem, RELiability()-; multiple -REL*- options.
+	-longnames: no known -longnames option
 	-CHOices()- from -nlogittree, CHOice()-.
 	-choices(, LIstname())- would be -Listname()- (from -list-) except for
 		-choices(, label)-; instead from -return LIst-.
@@ -116,7 +120,8 @@ pr odkmeta
 		`"`sfn'"', st_local("csv"),
 		/* column headers */ st_local("type"), st_local("sname"),
 			st_local("slabel"), st_local("disabled"),
-		st_local("dropattrib"), st_local("keepattrib"), "`relax'" != "")
+		    st_local("dropattrib"), st_local("keepattrib"),
+			"`relax'" != "", "`longnames'" != "")
 	;
 	#d cr
 
@@ -1931,7 +1936,7 @@ void write_survey(
 		`SS' _isotherchar,
 	`SS' _survey, `SS' _csv,
 	/* column headers */ `SS' _type, `SS' _name, `SS' _label, `SS' _disabled,
-	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax)
+	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax, `RS' _longnames)
 {
 	`RS' anyselect, anymultiple, anynote, nfields, isselect, anyrepeat, i
 	`RR' col
@@ -2011,7 +2016,8 @@ void write_survey(
 
 	write_survey_start(df, attr, charpre)
 	write_fields(df, fields, attr, _csv, _relax)
-
+	if (_longnames)
+		write_rename_longnames(df)
 	df.close()
 
 	// Write the first cleaning do-file, a section of the final do-file that
@@ -2915,7 +2921,20 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 		}
 	}
 }
-
+void write_rename_longnames(`DoFileWriterS' df)
+{
+	df.put("* Abbreviate long variable names that exceed Stata's 32 character maximum.")
+	df.put("foreach var of varlist _all {")
+	df.put(`"if "\`:char \`var'[Odk_group]'" != "" {"')
+	df.put(`"local name = "\`:char \`var'[Odk_name]'" + ///"')
+	df.put(`"cond(\`:char \`var'[Odk_is_other]', "_other", "") + ///"')
+	df.put(`""\`:char \`var'[Odk_geopoint]'""')
+	df.put(`"local newvar = strtoname("\`name'")"')
+	df.put("capture rename \`var' \`newvar'")
+	df.put("}")
+	df.put("}")
+	df.put("")
+}
 void write_dta_loop_start(`DoFileWriterS' df, `AttribSetS' attr)
 {
 	df.put("foreach dta of local dtas {")

@@ -20,7 +20,7 @@ void write_survey(
 		`SS' _isotherchar,
 	`SS' _survey, `SS' _csv,
 	/* column headers */ `SS' _type, `SS' _name, `SS' _label, `SS' _disabled,
-	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax)
+	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax, `RS' _longnames)
 {
 	`RS' anyselect, anymultiple, anynote, nfields, isselect, anyrepeat, i
 	`RR' col
@@ -100,7 +100,8 @@ void write_survey(
 
 	write_survey_start(df, attr, charpre)
 	write_fields(df, fields, attr, _csv, _relax)
-
+	if (_longnames)
+		write_rename_longnames(df)
 	df.close()
 
 	// Write the first cleaning do-file, a section of the final do-file that
@@ -1004,7 +1005,20 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 		}
 	}
 }
-
+void write_rename_longnames(`DoFileWriterS' df)
+{
+	df.put("* Abbreviate long variable names that exceed Stata's 32 character maximum.")
+	df.put("foreach var of varlist _all {")
+	df.put(`"if "\`:char \`var'[Odk_group]'" != "" {"')
+	df.put(`"local name = "\`:char \`var'[Odk_name]'" + ///"')
+	df.put(`"cond(\`:char \`var'[Odk_is_other]', "_other", "") + ///"')
+	df.put(`""\`:char \`var'[Odk_geopoint]'""')
+	df.put(`"local newvar = strtoname("\`name'")"')
+	df.put("capture rename \`var' \`newvar'")
+	df.put("}")
+	df.put("}")
+	df.put("")
+}
 void write_dta_loop_start(`DoFileWriterS' df, `AttribSetS' attr)
 {
 	df.put("foreach dta of local dtas {")

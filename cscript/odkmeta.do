@@ -144,7 +144,7 @@ run "ODK to Stata"
 compall Expected
 cd ..
 
-* Test 52
+/** Test 52
 cd 52
 #d ;
 odkmeta using "ODK to Stata.do",
@@ -157,6 +157,7 @@ odkmeta using "ODK to Stata.do",
 run "ODK to Stata"
 compall Expected
 cd ..
+*/
 
 * Test 54
 cd 54
@@ -191,7 +192,7 @@ odkmeta using "ODK to Stata.do", ///
 run "ODK to Stata"
 compall Expected
 cd ..
-
+/*
 * Test 76
 cd 76
 #d ;
@@ -205,7 +206,7 @@ odkmeta using "ODK to Stata.do",
 run "ODK to Stata"
 compall Expected
 cd ..
-
+*/
 /*
 * Test 77
 cd 77
@@ -233,6 +234,7 @@ run "ODK to Stata"
 compall Expected
 cd ..
 
+/*
 * Test 96
 cd 96
 odkmeta using "ODK to Stata.do", ///
@@ -240,6 +242,7 @@ odkmeta using "ODK to Stata.do", ///
 run "ODK to Stata"
 compall Expected
 cd ..
+*/
 
 * Test 108
 cd 108
@@ -264,6 +267,7 @@ run import
 compall Expected
 cd ..
 
+/*
 * Test 199
 cd 199
 odkmeta using "ODK to Stata.do", ///
@@ -271,6 +275,7 @@ odkmeta using "ODK to Stata.do", ///
 run "ODK to Stata"
 compall Expected
 cd ..
+*/
 
 * Test 208
 cd 208
