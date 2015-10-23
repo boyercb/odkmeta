@@ -20,7 +20,7 @@ void write_survey(
 		`SS' _isotherchar,
 	`SS' _survey, `SS' _csv,
 	/* column headers */ `SS' _type, `SS' _name, `SS' _label, `SS' _disabled,
-	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax, `RS' _longnames)
+	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax, `RS' _shortnames)
 {
 	`RS' anyselect, anymultiple, anynote, nfields, isselect, anyrepeat, i
 	`RR' col
@@ -100,8 +100,8 @@ void write_survey(
 
 	write_survey_start(df, attr, charpre)
 	write_fields(df, fields, attr, _csv, _relax)
-	if (_longnames)
-		write_rename_longnames(df)
+	if (_shortnames)
+		write_shortnames(df)
 	df.close()
 
 	// Write the first cleaning do-file, a section of the final do-file that
@@ -1005,7 +1005,7 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 		}
 	}
 }
-void write_rename_longnames(`DoFileWriterS' df)
+void write_shortnames(`DoFileWriterS' df)
 {
 	df.put("* Abbreviate long variable names that exceed Stata's 32 character maximum.")
 	df.put("foreach var of varlist _all {")
